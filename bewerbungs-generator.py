@@ -35,8 +35,12 @@ latex_jinja_env = jinja2.Environment(
 	loader = jinja2.FileSystemLoader(os.path.abspath('templates/'))
 )
 
-template = latex_jinja_env.get_template('test.tex')
-print(template.render(abc='Hello'))
+template = latex_jinja_env.get_template('testt.tex')
+
+with open('test.tex', 'w') as f:
+	f.write(template.render(name='Bernd Lieferts'))
+
+os.system('pdflatex test.tex -interaction nonstopmode')
 
 def deckblatt():
 	# -> deckblatt.tex
