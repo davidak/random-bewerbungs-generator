@@ -18,6 +18,7 @@
 
 import os
 import jinja2
+from subprocess import Popen
 
 __version__ = '0.1'
 
@@ -40,7 +41,11 @@ template = latex_jinja_env.get_template('testt.tex')
 with open('test.tex', 'w') as f:
 	f.write(template.render(name='Bernd Lieferts'))
 
-os.system('pdflatex test.tex -interaction nonstopmode')
+with open('test2.tex', 'w') as f:
+	f.write(template.render(name='Manfred Linz'))
+
+with open('test3.tex', 'w') as f:
+	f.write(template.render(name='Ferdinand Koff'))
 
 def deckblatt():
 	# -> deckblatt.tex
@@ -56,9 +61,22 @@ def lebenslauf():
 
 def main():
 	# Person generieren
-	# -> bewerbung.tex -> bewerbung.pdf 
-	# deckblatt optional
-	pass
+
+	deckblatt()
+	deck_proc = Popen('pdflatex -interaction=nonstopmode test.tex', shell=True)
+
+	anschreiben()
+	ans_proc = Popen('pdflatex -interaction=nonstopmode test2.tex', shell=True)
+
+	lebenslauf()
+	leb_proc = Popen('pdflatex -interaction=nonstopmode test3.tex', shell=True)
+
+	# wait for pdf generation
+	deck_proc.wait()
+	ans_proc.wait()
+	leb_proc.wait()
+
+	bew_proc = Popen('pdflatex -interaction=nonstopmode bewerbung.tex', shell=True).wait()
 
 if __name__ == "__main__":
 	main()
