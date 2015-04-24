@@ -52,9 +52,10 @@ def lebenslauf():
 	with open('work/lebenslauf.tex', 'w') as f:
 		f.write(_template.render(name='Ferdinand Koff'))
 
-def main():
-	# Person generieren
-
+def bewerbung():
+	# aufräumen
+	Popen('rm -f work/*', shell=True).wait()
+	
 	mit_deckblatt = random.randint(0,1)
 	if mit_deckblatt:
 		deckblatt()
@@ -77,8 +78,13 @@ def main():
 	_template = latex_jinja_env.get_template('bewerbung.tex')
 	with open('work/bewerbung.tex', 'w') as f:
 		f.write(_template.render(deckblatt=mit_deckblatt))
-	Popen('pdflatex -interaction=nonstopmode -output-directory=bewerbungen work/bewerbung.tex', shell=True).wait()
-	Popen("mv bewerbungen/bewerbung.pdf 'bewerbungen/Bewerbung {0}.pdf'".format(name), shell=True).wait()
+	Popen('pdflatex -interaction=nonstopmode -output-directory=work work/bewerbung.tex', shell=True).wait()
+	Popen("mv work/bewerbung.pdf 'bewerbungen/Bewerbung {0}.pdf'".format(name), shell=True).wait()
+
+def main():
+	# Person generieren
+
+	bewerbung()
 
 if __name__ == "__main__":
 	main()
