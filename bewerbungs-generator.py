@@ -36,47 +36,45 @@ latex_jinja_env = jinja2.Environment(
 	loader = jinja2.FileSystemLoader(os.path.abspath('templates/'))
 )
 
-template = latex_jinja_env.get_template('testt.tex')
-
-with open('test.tex', 'w') as f:
-	f.write(template.render(name='Bernd Lieferts'))
-
-with open('test2.tex', 'w') as f:
-	f.write(template.render(name='Manfred Linz'))
-
-with open('test3.tex', 'w') as f:
-	f.write(template.render(name='Ferdinand Koff'))
-
 def deckblatt():
-	# -> deckblatt.tex
-	pass
+	_template = latex_jinja_env.get_template('testt.tex')
+	with open('work/deckblatt.tex', 'w') as f:
+		f.write(_template.render(name='Bernd Lieferts'))
 
 def anschreiben():
-	# -> anschreiben.tex
-	pass
+	_template = latex_jinja_env.get_template('testt.tex')
+	with open('work/anschreiben.tex', 'w') as f:
+		f.write(_template.render(name='Manfred Linz'))
 
 def lebenslauf():
-	# -> lebenslauf.tex
-	pass
+	_template = latex_jinja_env.get_template('testt.tex')
+	with open('work/lebenslauf.tex', 'w') as f:
+		f.write(_template.render(name='Ferdinand Koff'))
 
 def main():
 	# Person generieren
 
 	deckblatt()
-	deck_proc = Popen('pdflatex -interaction=nonstopmode test.tex', shell=True)
+	deck_proc = Popen('pdflatex -interaction=nonstopmode -output-directory=work work/deckblatt.tex', shell=True)
 
 	anschreiben()
-	ans_proc = Popen('pdflatex -interaction=nonstopmode test2.tex', shell=True)
+	ans_proc = Popen('pdflatex -interaction=nonstopmode -output-directory=work work/anschreiben.tex', shell=True)
 
 	lebenslauf()
-	leb_proc = Popen('pdflatex -interaction=nonstopmode test3.tex', shell=True)
+	leb_proc = Popen('pdflatex -interaction=nonstopmode -output-directory=work work/lebenslauf.tex', shell=True)
 
 	# wait for pdf generation
 	deck_proc.wait()
 	ans_proc.wait()
 	leb_proc.wait()
 
-	bew_proc = Popen('pdflatex -interaction=nonstopmode bewerbung.tex', shell=True).wait()
+	name = 'Manfred Linz'
+
+	_template = latex_jinja_env.get_template('bewerbung.tex')
+	with open('work/bewerbung.tex', 'w') as f:
+		f.write(_template.render())
+	Popen('pdflatex -interaction=nonstopmode -output-directory=bewerbungen work/bewerbung.tex', shell=True).wait()
+	Popen("mv bewerbungen/bewerbung.pdf 'bewerbungen/Bewerbung {0}.pdf'".format(name), shell=True)
 
 if __name__ == "__main__":
 	main()
