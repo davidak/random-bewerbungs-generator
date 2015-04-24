@@ -18,6 +18,7 @@
 
 import os
 import jinja2
+import random
 from subprocess import Popen
 
 __version__ = '0.1'
@@ -54,8 +55,10 @@ def lebenslauf():
 def main():
 	# Person generieren
 
-	deckblatt()
-	deck_proc = Popen('pdflatex -interaction=nonstopmode -output-directory=work work/deckblatt.tex', shell=True)
+	mit_deckblatt = random.randint(0,1)
+	if mit_deckblatt:
+		deckblatt()
+		deck_proc = Popen('pdflatex -interaction=nonstopmode -output-directory=work work/deckblatt.tex', shell=True)
 
 	anschreiben()
 	ans_proc = Popen('pdflatex -interaction=nonstopmode -output-directory=work work/anschreiben.tex', shell=True)
@@ -64,7 +67,8 @@ def main():
 	leb_proc = Popen('pdflatex -interaction=nonstopmode -output-directory=work work/lebenslauf.tex', shell=True)
 
 	# wait for pdf generation
-	deck_proc.wait()
+	if mit_deckblatt:
+		deck_proc.wait()
 	ans_proc.wait()
 	leb_proc.wait()
 
@@ -72,9 +76,9 @@ def main():
 
 	_template = latex_jinja_env.get_template('bewerbung.tex')
 	with open('work/bewerbung.tex', 'w') as f:
-		f.write(_template.render())
+		f.write(_template.render(deckblatt=mit_deckblatt))
 	Popen('pdflatex -interaction=nonstopmode -output-directory=bewerbungen work/bewerbung.tex', shell=True).wait()
-	Popen("mv bewerbungen/bewerbung.pdf 'bewerbungen/Bewerbung {0}.pdf'".format(name), shell=True)
+	Popen("mv bewerbungen/bewerbung.pdf 'bewerbungen/Bewerbung {0}.pdf'".format(name), shell=True).wait()
 
 if __name__ == "__main__":
 	main()
