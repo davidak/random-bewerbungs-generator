@@ -18,8 +18,9 @@
 
 import os
 import jinja2
-import random
+import random as r
 from subprocess import Popen
+from pyzufall.person import Person
 
 __version__ = '0.1'
 
@@ -58,13 +59,17 @@ def bewerbung():
 		f.write(_template.render(deckblatt=mit_deckblatt))
 
 def main():
-	# Person generieren
-	name = 'Manfred Linz'
+	bewerber = Person()
 
-	# aufräumen
+	# daten von vorherigem lauf entfernen
 	Popen('rm -f work/*', shell=True).wait()
 	
-	mit_deckblatt = random.randint(0,1)
+	# 30% Wahrscheinlichkeit ein Deckblatt
+	global mit_deckblatt
+	if r.randint(1, 100) <= 30:
+		mit_deckblatt = 1
+	else:
+		mit_deckblatt = 0
 	if mit_deckblatt:
 		deckblatt()
 		deck_proc = Popen('pdflatex -interaction=nonstopmode -output-directory=work work/deckblatt.tex', shell=True)
@@ -80,10 +85,10 @@ def main():
 		deck_proc.wait()
 	ans_proc.wait()
 	leb_proc.wait()
-	
+
 	bewerbung()
 	Popen('pdflatex -interaction=nonstopmode -output-directory=work work/bewerbung.tex', shell=True).wait()
-	Popen("mv work/bewerbung.pdf 'bewerbungen/Bewerbung {0}.pdf'".format(name), shell=True).wait()
+	Popen("mv work/bewerbung.pdf 'bewerbungen/Bewerbung {0}.pdf'".format(bewerber.name), shell=True).wait()
 
 if __name__ == "__main__":
 	main()
