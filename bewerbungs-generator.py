@@ -20,6 +20,7 @@ import os
 import jinja2
 import random as r
 from subprocess import Popen
+from glob import glob
 from pyzufall.person import Person
 
 __version__ = '0.1'
@@ -41,17 +42,20 @@ latex_jinja_env = jinja2.Environment(
 def deckblatt():
 	_template = latex_jinja_env.get_template('testt.tex')
 	with open('work/deckblatt.tex', 'w') as f:
-		f.write(_template.render(name='Bernd Lieferts'))
+		f.write(_template.render(name='Bernd Lieferts').encode('utf-8'))
 
 def anschreiben():
 	_template = latex_jinja_env.get_template('testt.tex')
 	with open('work/anschreiben.tex', 'w') as f:
-		f.write(_template.render(name='Manfred Linz'))
+		f.write(_template.render(name='Manfred Linz').encode('utf-8'))
 
-def lebenslauf():
-	_template = latex_jinja_env.get_template('testt.tex')
+def lebenslauf(name):
+	_template_files = glob('templates/lebenslauf_[0-9][0-9].tex')
+	_template_file = os.path.basename(r.choice(_template_files))
+	print("Used Template: " + _template_file)
+	_template = latex_jinja_env.get_template(_template_file)
 	with open('work/lebenslauf.tex', 'w') as f:
-		f.write(_template.render(name='Ferdinand Koff'))
+		f.write(_template.render(bewerber=bewerber).encode('utf-8'))
 
 def bewerbung():
 	_template = latex_jinja_env.get_template('bewerbung.tex')
@@ -59,14 +63,16 @@ def bewerbung():
 		f.write(_template.render(deckblatt=mit_deckblatt))
 
 def main():
+	global bewerber
 	bewerber = Person()
+	print(bewerber)
 
 	# daten von vorherigem lauf entfernen
 	Popen('rm -f work/*', shell=True).wait()
 	
 	# 30% Wahrscheinlichkeit ein Deckblatt
 	global mit_deckblatt
-	if r.randint(1, 100) <= 30:
+	if False:# gibt noch kein Deckblatt r.randint(1, 100) <= 30:
 		mit_deckblatt = 1
 	else:
 		mit_deckblatt = 0
